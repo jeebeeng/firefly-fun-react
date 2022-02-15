@@ -34,10 +34,10 @@ const Firefly = ({ data, update }) => {
     <div
       className="firefly"
       style={{
-        height: `${FIREFLY_SIZE - 1}px`,
-        width: `${FIREFLY_SIZE - 1}px`,
-        left: `${FIREFLY_SIZE * data.x + 1}px`,
-        top: `${FIREFLY_SIZE * data.y + 1}px`,
+        height: `${FIREFLY_SIZE - 4}px`,
+        width: `${FIREFLY_SIZE - 4}px`,
+        left: `${FIREFLY_SIZE * data.x}px`,
+        top: `${FIREFLY_SIZE * data.y}px`,
         backgroundColor: `${color}`
       }}
     ></div>
@@ -50,7 +50,9 @@ const Game = () => {
   useEffect(() => {
     const newFireflies = []
     for (let i = 0; i < 10; i++) {
-      newFireflies.push({ x: i, y: i, interval: randomInterval() })
+      for (let j = 0; j < 10; j++) {
+        newFireflies.push({ x: j, y: i, interval: randomInterval() })
+      }
     }
     setFireflies(newFireflies)
   }, [])
@@ -74,13 +76,7 @@ const Game = () => {
   }
 
   return (
-    <div
-      className="field"
-      style={{
-        height: `${HEIGHT}px`,
-        width: `${WIDTH}px`
-      }}
-    >
+    <div className="field">
       {fireflies.map(firefly => (
         <Firefly
           key={`${firefly.x}, ${firefly.y}, ${firefly.interval}`}
