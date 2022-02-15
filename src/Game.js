@@ -1,34 +1,55 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState } from 'react'
 import './Game.css'
 
 const OFF_INTERVAL = 1000
-const MIN_INTERVAL = 1200
+const MIN_INTERVAL = 1400
 const MAX_INTERVAL = 1800
+const FIREFLY_SIZE = 40
 
 const Firefly = ({ data, update }) => {
-  const [className, setClassName] = useState('firefly-dark')
+  const [color, setColor] = useState('black')
+  let darkTimer, lightTimer
 
   useEffect(() => {
-    const darkTimer = setTimeout(() => {
-      setClassName('firefly-light')
-      const lightTimer = setTimeout(() => {
-        update(data.x, data.y)
-      }, data.interval)
-    }, OFF_INTERVAL)
+    setUpTimeouts()
     return () => {
-      clearTimeout(darkTimer)
+      clearInterval(darkTimer)
+      clearTimeout(lightTimer)
     }
-  }, [update, data])
+  }, [data])
 
-  return <div className={`firefly ${className}`}></div>
+  const setUpTimeouts = () => {
+    darkTimer = setInterval(() => {
+      setColor('yellow')
+      lightTimer = setTimeout(() => {
+        setColor('black')
+        //update(data.x, data.y)
+      }, data.interval)
+    }, OFF_INTERVAL + data.interval)
+  }
+
+  return (
+    <div
+      style={{
+        height: `${FIREFLY_SIZE - 1}px`,
+        width: `${FIREFLY_SIZE - 1}px`,
+        left: `${FIREFLY_SIZE * data.x + 1}px`,
+        top: `${FIREFLY_SIZE * data.y + 1}px`,
+        backgroundColor: `${color}`
+      }}
+    ></div>
+  )
 }
 
 const Game = () => {
   const [fireflies, setFireflies] = useState([])
-  const [board, setBoard] = useState([])
 
   useEffect(() => {
-    setFireflies([{ x: 0, y: 0, interval: randomInterval() }])
+    const newFireflies = []
+    for (let i = 0; i < 10; i++) {
+      newFireflies.push({ x: i, y: i, interval: randomInterval() })
+    }
+    setFireflies(newFireflies)
   }, [])
 
   const randomInterval = () => {
@@ -50,7 +71,7 @@ const Game = () => {
   }
 
   return (
-    <div>
+    <div className="field">
       {fireflies.map(firefly => (
         <Firefly
           key={`${firefly.x}, ${firefly.y}, ${firefly.interval}`}
