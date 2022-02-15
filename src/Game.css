@@ -1,0 +1,15 @@
+.firefly {
+    height: 20px;
+    width: 20px;
+    margin-right: 4px;
+    margin-bottom: 4px;
+    border-color: white;
+}
+
+.firefly-light {
+    background-color: yellow;
+}
+
+.firefly-dark {
+    background-color: black;
+}
