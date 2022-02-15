@@ -3,8 +3,10 @@ import './Game.css'
 
 const OFF_INTERVAL = 1000
 const MIN_INTERVAL = 1400
-const MAX_INTERVAL = 1800
+const MAX_INTERVAL = 900
 const FIREFLY_SIZE = 40
+const WIDTH = 800
+const HEIGHT = 800
 
 const Firefly = ({ data, update }) => {
   const [color, setColor] = useState('black')
@@ -30,6 +32,7 @@ const Firefly = ({ data, update }) => {
 
   return (
     <div
+      className="firefly"
       style={{
         height: `${FIREFLY_SIZE - 1}px`,
         width: `${FIREFLY_SIZE - 1}px`,
@@ -71,7 +74,13 @@ const Game = () => {
   }
 
   return (
-    <div className="field">
+    <div
+      className="field"
+      style={{
+        height: `${HEIGHT}px`,
+        width: `${WIDTH}px`
+      }}
+    >
       {fireflies.map(firefly => (
         <Firefly
           key={`${firefly.x}, ${firefly.y}, ${firefly.interval}`}

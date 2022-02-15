@@ -1,5 +1,10 @@
+.firefly {
+    position: absolute;
+}
+
 .field {
-  background-color: grey;
-  height: 800px;
-  width: 800px;
+    position: relative;
+    margin: 0;
+    padding: 0;
+    background-color: grey;
 }
