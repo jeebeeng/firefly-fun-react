@@ -7,6 +7,7 @@ const MIN_ON_INTERVAL = 800
 const MAX_ON_INTERVAL = 2000
 const FIREFLY_SIZE = 40
 const NUM_ROW_FIREFLIES = 10
+const INTERVAL_INCREMENT = 50
 
 const Firefly = ({ data, update }) => {
   const [color, setColor] = useState('black')
@@ -15,13 +16,13 @@ const Firefly = ({ data, update }) => {
   useEffect(() => {
     setUpTimeouts()
     return () => {
-      clearTimeout(darkTimer)
+      clearInterval(darkTimer)
       clearTimeout(lightTimer)
     }
   }, [])
 
   const setUpTimeouts = () => {
-    darkTimer = setTimeout(() => {
+    darkTimer = setInterval(() => {
       setColor('yellow')
       lightTimer = setTimeout(() => {
         update(data.x, data.y)
@@ -52,8 +53,10 @@ const Game = () => {
   useEffect(() => {
     const newFireflies = []
     const newOnIntervals = []
+    const newOffIntervals = []
     for (let i = 0; i < NUM_ROW_FIREFLIES; i++) {
       newOnIntervals.push([])
+      newOffIntervals.push([])
       for (let j = 0; j < NUM_ROW_FIREFLIES; j++) {
         const onInterval = randomInterval(MIN_ON_INTERVAL, MAX_ON_INTERVAL)
         const offInterval = randomInterval(MIN_OFF_INTERVAL, MAX_OFF_INTERVAL)
@@ -65,23 +68,78 @@ const Game = () => {
         }
         newFireflies.push(newFireFly)
         newOnIntervals[i][j] = onInterval
+        newOffIntervals[i][j] = offInterval
       }
     }
     setFireflies(newFireflies)
     setOnIntervals(newOnIntervals)
+    setOffIntervals(newOffIntervals)
   }, [])
 
   const randomInterval = (min, max) => {
     return Math.floor(Math.random() * (max - min) + min)
   }
 
+  const averageInterval = (x, y, intervals) => {
+    const directions = [
+      [1, 1],
+      [0, 1],
+      [1, 0],
+      [-1, -1],
+      [-1, 0],
+      [0, -1],
+      [-1, 1],
+      [1, -1]
+    ]
+    let sum = 0
+    let num = 0
+
+    directions.forEach(d => {
+      let curr = intervals[x + d[0]]
+      if (curr === undefined) {
+        return
+      }
+      curr = curr[y + d[1]]
+      if (curr) {
+        sum += curr
+        num++
+      }
+    })
+
+    return sum / num
+  }
+
+  const compareAvgIntervals = (average, interval) => {
+    if (interval < average) {
+      return INTERVAL_INCREMENT
+    } else if (interval > average) {
+      return -INTERVAL_INCREMENT
+    } else {
+      return 0
+    }
+  }
+
   const updateInterval = (x, y) => {
     setFireflies(prevFireflies =>
       prevFireflies.map(firefly => {
         if (firefly.x === x && firefly.y === y) {
-          const offInterval = randomInterval(MIN_ON_INTERVAL, MAX_ON_INTERVAL)
-          const onInterval = randomInterval(MIN_OFF_INTERVAL, MAX_OFF_INTERVAL)
-          return { x, y, onInterval, offInterval }
+          const onInterval =
+            firefly.onInterval +
+            compareAvgIntervals(
+              averageInterval(firefly.x, firefly.y, onIntervals),
+              firefly.onInterval
+            )
+          const offInterval =
+            firefly.offInterval +
+            compareAvgIntervals(
+              averageInterval(firefly.x, firefly.y, offIntervals),
+              firefly.offInterval
+            )
+          return {
+            ...firefly,
+            onInterval,
+            offInterval
+          }
         }
         return firefly
       })
@@ -89,15 +147,17 @@ const Game = () => {
   }
 
   return (
-    <div className="field">
-      {fireflies.map(firefly => (
-        <Firefly
-          key={`${firefly.x}, ${firefly.y}, ${firefly.onInterval}`}
-          data={firefly}
-          update={updateInterval}
-        />
-      ))}
-    </div>
+    <>
+      <div className="field">
+        {fireflies.map(firefly => (
+          <Firefly
+            key={`${firefly.x}, ${firefly.y}, ${firefly.onInterval}`}
+            data={firefly}
+            update={updateInterval}
+          />
+        ))}
+      </div>
+    </>
   )
 }
 
