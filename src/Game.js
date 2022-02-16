@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import './Game.css'
 
-const OFF_INTERVAL = 1500
-const MIN_INTERVAL = 800
-const MAX_INTERVAL = 2000
+const MIN_OFF_INTERVAL = 1200
+const MAX_OFF_INTERVAL = 1900
+const MIN_ON_INTERVAL = 800
+const MAX_ON_INTERVAL = 2000
 const FIREFLY_SIZE = 40
 const NUM_ROW_FIREFLIES = 10
 
@@ -25,8 +26,8 @@ const Firefly = ({ data, update }) => {
       lightTimer = setTimeout(() => {
         update(data.x, data.y)
         setColor('black')
-      }, data.interval)
-    }, OFF_INTERVAL + data.interval)
+      }, data.onInterval)
+    }, data.offInterval)
   }
 
   return (
@@ -45,40 +46,42 @@ const Firefly = ({ data, update }) => {
 
 const Game = () => {
   const [fireflies, setFireflies] = useState([])
-  const [lightIntervals, setLightIntervals] = useState([])
+  const [onIntervals, setOnIntervals] = useState([])
+  const [offIntervals, setOffIntervals] = useState([])
 
   useEffect(() => {
     const newFireflies = []
-    const newIntervals = []
+    const newOnIntervals = []
     for (let i = 0; i < NUM_ROW_FIREFLIES; i++) {
-      newIntervals.push([])
+      newOnIntervals.push([])
       for (let j = 0; j < NUM_ROW_FIREFLIES; j++) {
-        const newInterval = randomInterval()
+        const onInterval = randomInterval(MIN_ON_INTERVAL, MAX_ON_INTERVAL)
+        const offInterval = randomInterval(MIN_OFF_INTERVAL, MAX_OFF_INTERVAL)
         const newFireFly = {
-          x: j,
-          y: i,
-          interval: newInterval
+          x: i,
+          y: j,
+          onInterval,
+          offInterval
         }
         newFireflies.push(newFireFly)
-        newIntervals[i][j] = newInterval
+        newOnIntervals[i][j] = onInterval
       }
     }
     setFireflies(newFireflies)
-    setLightIntervals(newIntervals)
+    setOnIntervals(newOnIntervals)
   }, [])
 
-  const randomInterval = () => {
-    return Math.floor(
-      Math.random() * (MAX_INTERVAL - MIN_INTERVAL) + MIN_INTERVAL
-    )
+  const randomInterval = (min, max) => {
+    return Math.floor(Math.random() * (max - min) + min)
   }
 
   const updateInterval = (x, y) => {
     setFireflies(prevFireflies =>
       prevFireflies.map(firefly => {
         if (firefly.x === x && firefly.y === y) {
-          const newInterval = randomInterval()
-          return { x, y, interval: newInterval }
+          const offInterval = randomInterval(MIN_ON_INTERVAL, MAX_ON_INTERVAL)
+          const onInterval = randomInterval(MIN_OFF_INTERVAL, MAX_OFF_INTERVAL)
+          return { x, y, onInterval, offInterval }
         }
         return firefly
       })
@@ -89,7 +92,7 @@ const Game = () => {
     <div className="field">
       {fireflies.map(firefly => (
         <Firefly
-          key={`${firefly.x}, ${firefly.y}, ${firefly.interval}`}
+          key={`${firefly.x}, ${firefly.y}, ${firefly.onInterval}`}
           data={firefly}
           update={updateInterval}
         />
