@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import './Game.css'
 
-const OFF_INTERVAL = 2000
+const OFF_INTERVAL = 1500
 const MIN_INTERVAL = 800
 const MAX_INTERVAL = 2000
 const FIREFLY_SIZE = 40
+const NUM_ROW_FIREFLIES = 10
 
 const Firefly = ({ data, update }) => {
   const [color, setColor] = useState('black')
@@ -44,15 +45,26 @@ const Firefly = ({ data, update }) => {
 
 const Game = () => {
   const [fireflies, setFireflies] = useState([])
+  const [lightIntervals, setLightIntervals] = useState([])
 
   useEffect(() => {
     const newFireflies = []
-    for (let i = 0; i < 10; i++) {
-      for (let j = 0; j < 10; j++) {
-        newFireflies.push({ x: j, y: i, interval: randomInterval() })
+    const newIntervals = []
+    for (let i = 0; i < NUM_ROW_FIREFLIES; i++) {
+      newIntervals.push([])
+      for (let j = 0; j < NUM_ROW_FIREFLIES; j++) {
+        const newInterval = randomInterval()
+        const newFireFly = {
+          x: j,
+          y: i,
+          interval: newInterval
+        }
+        newFireflies.push(newFireFly)
+        newIntervals[i][j] = newInterval
       }
     }
     setFireflies(newFireflies)
+    setLightIntervals(newIntervals)
   }, [])
 
   const randomInterval = () => {
