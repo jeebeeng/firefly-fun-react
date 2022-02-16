@@ -7,7 +7,7 @@ const MIN_ON_INTERVAL = 800
 const MAX_ON_INTERVAL = 2000
 const FIREFLY_SIZE = 40
 const NUM_ROW_FIREFLIES = 10
-const INTERVAL_INCREMENT = 50
+const INTERVAL_INCREMENT = 10
 
 const Firefly = ({ data, update }) => {
   const [color, setColor] = useState('black')
@@ -77,7 +77,7 @@ const Game = () => {
   }, [])
 
   const randomInterval = (min, max) => {
-    return Math.floor(Math.random() * (max - min) + min)
+    return Math.floor((Math.random() * (max - min) + min) / 10) * 10
   }
 
   const averageInterval = (x, y, intervals) => {
