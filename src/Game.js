@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import './Game.css'
 
-const OFF_INTERVAL = 1000
-const MIN_INTERVAL = 1400
-const MAX_INTERVAL = 900
+const OFF_INTERVAL = 2000
+const MIN_INTERVAL = 800
+const MAX_INTERVAL = 2000
 const FIREFLY_SIZE = 40
-const WIDTH = 800
-const HEIGHT = 800
 
 const Firefly = ({ data, update }) => {
   const [color, setColor] = useState('black')
@@ -15,17 +13,17 @@ const Firefly = ({ data, update }) => {
   useEffect(() => {
     setUpTimeouts()
     return () => {
-      clearInterval(darkTimer)
+      clearTimeout(darkTimer)
       clearTimeout(lightTimer)
     }
-  }, [data])
+  }, [])
 
   const setUpTimeouts = () => {
-    darkTimer = setInterval(() => {
+    darkTimer = setTimeout(() => {
       setColor('yellow')
       lightTimer = setTimeout(() => {
+        update(data.x, data.y)
         setColor('black')
-        //update(data.x, data.y)
       }, data.interval)
     }, OFF_INTERVAL + data.interval)
   }
@@ -36,8 +34,8 @@ const Firefly = ({ data, update }) => {
       style={{
         height: `${FIREFLY_SIZE - 4}px`,
         width: `${FIREFLY_SIZE - 4}px`,
-        left: `${FIREFLY_SIZE * data.x}px`,
-        top: `${FIREFLY_SIZE * data.y}px`,
+        left: `${FIREFLY_SIZE * data.x * 1.5}px`,
+        top: `${FIREFLY_SIZE * data.y * 1.5}px`,
         backgroundColor: `${color}`
       }}
     ></div>
@@ -64,8 +62,8 @@ const Game = () => {
   }
 
   const updateInterval = (x, y) => {
-    setFireflies(
-      fireflies.map(firefly => {
+    setFireflies(prevFireflies =>
+      prevFireflies.map(firefly => {
         if (firefly.x === x && firefly.y === y) {
           const newInterval = randomInterval()
           return { x, y, interval: newInterval }
